@@ -1,5 +1,6 @@
 "use client";
 
+import BalanceDisplay from "@/components/BalanceDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,11 +14,10 @@ import { PlusIcon, SendIcon } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
 
-
 export default function Dashboard() {
 	const { nearAccountId, nearPrivateKey, setNearAccountId, setNearPrivateKey } =
 		useNearStore();
-	const { caSendEth, caMintNFT, isCaEnabled, error } = useNearCA(
+	const { caSendEth, caMintERC20, isCaEnabled, error, adapter } = useNearCA(
 		nearAccountId,
 		nearPrivateKey,
 	);
@@ -48,7 +48,7 @@ export default function Dashboard() {
 		setTransferTo("");
 	};
 
-	const handleMintNFT = () => {
+	const handleMintERC20 = () => {
 		if (!isCaEnabled) {
 			toast({
 				title: "Error",
@@ -57,14 +57,22 @@ export default function Dashboard() {
 			});
 			return;
 		}
-		caMintNFT();
+		caMintERC20();
 	};
 
 	return (
 		<div className="container mx-auto p-4 space-y-6">
-			<h1 className="text-3xl font-bold mb-6">
-				Universal Testnet Wallet Dashboard
-			</h1>
+			<h1 className="text-3xl font-bold mb-6">Universal Wallet Dashboard</h1>
+
+			{/* Balance Display */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Balance Display</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<BalanceDisplay address={adapter?.address as `0x${string}`} />
+				</CardContent>
+			</Card>
 
 			{/* NEAR Account Setup */}
 			<Card>
@@ -73,20 +81,28 @@ export default function Dashboard() {
 				</CardHeader>
 				<CardContent>
 					<div className="space-y-4">
-						<Input
-							type="text"
-							placeholder="Enter NEAR Account ID"
-							value={nearAccountId}
-							onChange={handleAccountIdChange}
-							className="p-2 border rounded"
-						/>
-						<Input
-							type="password"
-							placeholder="Enter NEAR Private Key"
-							value={nearPrivateKey}
-							onChange={handlePrivateKeyChange}
-							className="p-2 border rounded"
-						/>
+						<div className="space-y-2">
+							<Label htmlFor="nearAccountId">NEAR Account ID</Label>
+							<Input
+								id="nearAccountId"
+								type="text"
+								placeholder="Enter NEAR Account ID"
+								value={nearAccountId}
+								onChange={handleAccountIdChange}
+								className="p-2 border rounded"
+							/>
+						</div>
+						<div className="space-y-2">
+							<Label htmlFor="nearPrivateKey">NEAR Private Key</Label>
+							<Input
+								id="nearPrivateKey"
+								type="password"
+								placeholder="Enter NEAR Private Key"
+								value={nearPrivateKey}
+								onChange={handlePrivateKeyChange}
+								className="p-2 border rounded"
+							/>
+						</div>
 					</div>
 				</CardContent>
 			</Card>
@@ -168,7 +184,7 @@ export default function Dashboard() {
 				</CardHeader>
 				<CardContent>
 					<Button
-						onClick={handleMintNFT}
+						onClick={handleMintERC20}
 						className="w-full"
 						disabled={!isCaEnabled}
 					>

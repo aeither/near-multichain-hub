@@ -51,7 +51,7 @@ export function useNearCA(nearAccountId: string, nearPrivateKey: string) {
 		return hash;
 	}, [adapter]);
 
-	const caMintNFT = useCallback(async () => {
+	const caMintERC20 = useCallback(async () => {
 		if (!adapter) return;
 		const contractAddress = "0x3afbb57c8014ea432c4cb1ae5df2ce0f357c1a23";
 		const amountToMint = BigInt(20 * 10 ** 18);
@@ -73,15 +73,16 @@ export function useNearCA(nearAccountId: string, nearPrivateKey: string) {
 		};
 		const hash = await adapter.signAndSendTransaction(transaction);
 		console.log(
-			`Successfully minted 20 tokens to ${adapter.address}. Hash: ${hash}`,
+			`Successfully minted 20 ERC20 tokens to ${adapter.address}. Hash: ${hash}`,
 		);
 		return hash;
 	}, [adapter]);
 
 	return {
 		caSendEth,
-		caMintNFT,
+		caMintERC20,
 		isCaEnabled,
 		error,
+		adapter,
 	};
 }
