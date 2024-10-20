@@ -1,18 +1,30 @@
-// app/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { toast } from "@/hooks/use-toast";
 import { useNearCA } from "@/lib/hooks";
 import { useNearStore } from "@/store/nearStore";
-import Image from "next/image";
+import { AnimatePresence, motion } from "framer-motion";
+import { PlusIcon, SendIcon } from "lucide-react";
+import type React from "react";
+import { useState } from "react";
 
-export default function Home() {
+
+export default function Dashboard() {
 	const { nearAccountId, nearPrivateKey, setNearAccountId, setNearPrivateKey } =
 		useNearStore();
 	const { caSendEth, caMintNFT, isCaEnabled, error } = useNearCA(
 		nearAccountId,
 		nearPrivateKey,
 	);
+
+	const [transferAmount, setTransferAmount] = useState("");
+	const [transferTo, setTransferTo] = useState("");
+	const [transferNetwork, setTransferNetwork] = useState("Sepolia");
 
 	const handleAccountIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setNearAccountId(e.target.value);
@@ -22,53 +34,150 @@ export default function Home() {
 		setNearPrivateKey(e.target.value);
 	};
 
-	return (
-		<div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-			<main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-				<input
-					type="text"
-					placeholder="Enter NEAR Account ID"
-					value={nearAccountId}
-					onChange={handleAccountIdChange}
-					className="p-2 border rounded"
-				/>
-				<input
-					type="password"
-					placeholder="Enter NEAR Private Key"
-					value={nearPrivateKey}
-					onChange={handlePrivateKeyChange}
-					className="p-2 border rounded"
-				/>
-				<Image
-					className="dark:invert"
-					src="https://nextjs.org/icons/next.svg"
-					alt="Next.js logo"
-					width={180}
-					height={38}
-					priority
-				/>
-				<ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-					<li className="mb-2">
-						Get started by editing{" "}
-						<code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-							app/page.tsx
-						</code>
-						.
-					</li>
-					<li>Save and see your changes instantly.</li>
-				</ol>
+	const handleTransfer = () => {
+		if (!isCaEnabled) {
+			toast({
+				title: "Error",
+				description: "Contract Account is not enabled",
+				variant: "destructive",
+			});
+			return;
+		}
+		caSendEth();
+		setTransferAmount("");
+		setTransferTo("");
+	};
 
-				<Button onClick={caSendEth} disabled={!isCaEnabled}>
-					Send ETH
-				</Button>
-				<Button onClick={caMintNFT} disabled={!isCaEnabled}>
-					Mint NFT
-				</Button>
-				{error && <p className="text-red-500">{error.message}</p>}
-			</main>
-			<footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-				<div>footer</div>
-			</footer>
+	const handleMintNFT = () => {
+		if (!isCaEnabled) {
+			toast({
+				title: "Error",
+				description: "Contract Account is not enabled",
+				variant: "destructive",
+			});
+			return;
+		}
+		caMintNFT();
+	};
+
+	return (
+		<div className="container mx-auto p-4 space-y-6">
+			<h1 className="text-3xl font-bold mb-6">
+				Universal Testnet Wallet Dashboard
+			</h1>
+
+			{/* NEAR Account Setup */}
+			<Card>
+				<CardHeader>
+					<CardTitle>NEAR Account Setup</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<div className="space-y-4">
+						<Input
+							type="text"
+							placeholder="Enter NEAR Account ID"
+							value={nearAccountId}
+							onChange={handleAccountIdChange}
+							className="p-2 border rounded"
+						/>
+						<Input
+							type="password"
+							placeholder="Enter NEAR Private Key"
+							value={nearPrivateKey}
+							onChange={handlePrivateKeyChange}
+							className="p-2 border rounded"
+						/>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* Token Transfer */}
+			<Card>
+				<CardHeader>
+					<CardTitle>Token Transfer</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<div className="space-y-4">
+						<div className="flex space-x-2">
+							<Input
+								type="number"
+								placeholder="Amount"
+								value={transferAmount}
+								onChange={(e) => setTransferAmount(e.target.value)}
+								aria-label="Transfer Amount"
+							/>
+							<Input
+								placeholder="To Address"
+								value={transferTo}
+								onChange={(e) => setTransferTo(e.target.value)}
+								aria-label="To Address"
+							/>
+						</div>
+						<RadioGroup
+							value={transferNetwork}
+							onValueChange={setTransferNetwork}
+						>
+							<div className="flex space-x-2">
+								<div className="flex items-center space-x-2">
+									<RadioGroupItem value="Sepolia" id="sepolia" />
+									<Label htmlFor="sepolia">Sepolia</Label>
+								</div>
+								<div className="flex items-center space-x-2">
+									<RadioGroupItem value="Goerli" id="goerli" />
+									<Label htmlFor="goerli">Goerli</Label>
+								</div>
+								<div className="flex items-center space-x-2">
+									<RadioGroupItem value="Mumbai" id="mumbai" />
+									<Label htmlFor="mumbai">Mumbai</Label>
+								</div>
+							</div>
+						</RadioGroup>
+						<Button
+							onClick={handleTransfer}
+							className="w-full"
+							disabled={!isCaEnabled}
+						>
+							<SendIcon className="mr-2 h-4 w-4" /> Transfer
+						</Button>
+					</div>
+				</CardContent>
+			</Card>
+
+			{/* Visual Transfer Representation */}
+			<AnimatePresence>
+				{transferAmount && transferTo && (
+					<motion.div
+						initial={{ opacity: 0, y: 50 }}
+						animate={{ opacity: 1, y: 0 }}
+						exit={{ opacity: 0, y: -50 }}
+						className="flex justify-center items-center space-x-4"
+					>
+						<div className="text-lg font-bold">{transferNetwork}</div>
+						<SendIcon className="h-6 w-6" />
+						<div className="text-lg font-bold">
+							{transferTo.slice(0, 6)}...{transferTo.slice(-4)}
+						</div>
+					</motion.div>
+				)}
+			</AnimatePresence>
+
+			{/* NFT Minting */}
+			<Card>
+				<CardHeader>
+					<CardTitle>NFT Minting</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<Button
+						onClick={handleMintNFT}
+						className="w-full"
+						disabled={!isCaEnabled}
+					>
+						<PlusIcon className="mr-2 h-4 w-4" /> Mint NFT
+					</Button>
+				</CardContent>
+			</Card>
+
+			{error && <p className="text-red-500">{error.message}</p>}
 		</div>
 	);
 }
