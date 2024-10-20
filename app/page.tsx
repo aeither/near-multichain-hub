@@ -70,7 +70,9 @@ export default function Dashboard() {
 					<CardTitle>Balance Display</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<BalanceDisplay address={adapter?.address as `0x${string}`} />
+					<BalanceDisplay
+						address={adapter?.address as `0x${string}`}
+					/>
 				</CardContent>
 			</Card>
 
@@ -177,10 +179,10 @@ export default function Dashboard() {
 				)}
 			</AnimatePresence>
 
-			{/* NFT Minting */}
+			{/* ERC20 Minting */}
 			<Card>
 				<CardHeader>
-					<CardTitle>NFT Minting</CardTitle>
+					<CardTitle>ERC20 Minting</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<Button
@@ -188,7 +190,7 @@ export default function Dashboard() {
 						className="w-full"
 						disabled={!isCaEnabled}
 					>
-						<PlusIcon className="mr-2 h-4 w-4" /> Mint NFT
+						<PlusIcon className="mr-2 h-4 w-4" /> Mint ERC20
 					</Button>
 				</CardContent>
 			</Card>
