@@ -1,29 +1,25 @@
+// app/page.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useNearEthAdapter } from "@/lib/hooks";
+import { useNearCA } from "@/lib/hooks";
+import { useNearStore } from "@/store/nearStore";
 import Image from "next/image";
-import { useState } from "react";
-import { sepolia } from "viem/chains";
 
 export default function Home() {
-	const [nearAccountId, setNearAccountId] = useState("");
-	const [nearPrivateKey, setNearPrivateKey] = useState("");
-	const { adapter: evm, error } = useNearEthAdapter(
+	const { nearAccountId, nearPrivateKey, setNearAccountId, setNearPrivateKey } =
+		useNearStore();
+	const { caSendEth, caMintNFT, isCaEnabled, error } = useNearCA(
 		nearAccountId,
 		nearPrivateKey,
 	);
 
-	const doSomething = async () => {
-		if (evm) {
-			console.log("🚀 ~ run ~ evm:", evm.address);
-			const hash = await evm.signAndSendTransaction({
-				to: evm.address,
-				value: BigInt(1),
-				chainId: sepolia.id,
-			});
-			console.log("🚀 ~ doSomething ~ hash:", hash);
-		}
+	const handleAccountIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setNearAccountId(e.target.value);
+	};
+
+	const handlePrivateKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setNearPrivateKey(e.target.value);
 	};
 
 	return (
@@ -33,14 +29,14 @@ export default function Home() {
 					type="text"
 					placeholder="Enter NEAR Account ID"
 					value={nearAccountId}
-					onChange={(e) => setNearAccountId(e.target.value)}
+					onChange={handleAccountIdChange}
 					className="p-2 border rounded"
 				/>
 				<input
 					type="password"
 					placeholder="Enter NEAR Private Key"
 					value={nearPrivateKey}
-					onChange={(e) => setNearPrivateKey(e.target.value)}
+					onChange={handlePrivateKeyChange}
 					className="p-2 border rounded"
 				/>
 				<Image
@@ -61,11 +57,12 @@ export default function Home() {
 					</li>
 					<li>Save and see your changes instantly.</li>
 				</ol>
-				<Button
-					onClick={doSomething}
-					disabled={!nearAccountId || !nearPrivateKey}
-				>
-					Do something
+
+				<Button onClick={caSendEth} disabled={!isCaEnabled}>
+					Send ETH
+				</Button>
+				<Button onClick={caMintNFT} disabled={!isCaEnabled}>
+					Mint NFT
 				</Button>
 				{error && <p className="text-red-500">{error.message}</p>}
 			</main>
