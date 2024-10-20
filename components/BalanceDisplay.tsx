@@ -9,7 +9,6 @@ const ethShorten = (address: string) => {
   return `${start}...${end}`;
 };
 
-
 export const openCampusCodex = defineChain({
 	id: 656476,
 	testnet: true,

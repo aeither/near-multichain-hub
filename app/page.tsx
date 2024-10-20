@@ -1,6 +1,7 @@
 "use client";
 
 import BalanceDisplay from "@/components/BalanceDisplay";
+import TokenBalanceDisplay from "@/components/TokenBalanceDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -70,9 +71,16 @@ export default function Dashboard() {
 					<CardTitle>Balance Display</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<BalanceDisplay
-						address={adapter?.address as `0x${string}`}
-					/>
+					<BalanceDisplay address={adapter?.address as `0x${string}`} />
+				</CardContent>
+			</Card>
+
+			<Card>
+				<CardHeader>
+					<CardTitle>ERC20 Token Balance Display</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<TokenBalanceDisplay address={adapter?.address as `0x${string}`} />
 				</CardContent>
 			</Card>
 
@@ -109,10 +117,10 @@ export default function Dashboard() {
 				</CardContent>
 			</Card>
 
-			{/* Token Transfer */}
+			{/* Coin Transfer */}
 			<Card>
 				<CardHeader>
-					<CardTitle>Token Transfer</CardTitle>
+					<CardTitle>Coin Transfer</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<div className="space-y-4">
@@ -141,12 +149,12 @@ export default function Dashboard() {
 									<Label htmlFor="sepolia">Sepolia</Label>
 								</div>
 								<div className="flex items-center space-x-2">
-									<RadioGroupItem value="Goerli" id="goerli" />
-									<Label htmlFor="goerli">Goerli</Label>
+									<RadioGroupItem value="Morph" id="morph" />
+									<Label htmlFor="morph">Morph</Label>
 								</div>
 								<div className="flex items-center space-x-2">
-									<RadioGroupItem value="Mumbai" id="mumbai" />
-									<Label htmlFor="mumbai">Mumbai</Label>
+									<RadioGroupItem value="Open Campus" id="openCampus" />
+									<Label htmlFor="openCampus">Open Campus</Label>
 								</div>
 							</div>
 						</RadioGroup>
