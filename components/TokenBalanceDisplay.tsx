@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import {
-    createPublicClient,
-    defineChain,
-    erc20Abi,
-    formatUnits,
-    http,
+	createPublicClient,
+	defineChain,
+	erc20Abi,
+	formatUnits,
+	http,
 } from "viem";
 import { morphHolesky, sepolia } from "viem/chains";
 
@@ -33,7 +33,7 @@ const networks = [
 	{
 		chain: sepolia,
 		name: "Sepolia",
-		tokenAddress: "0x54dc559F6197FAd1eBAB6aA59D9362d9925B6c31",
+		tokenAddress: "0x3AFBb57C8014EA432c4cB1ae5Df2cE0f357c1a23",
 	}, // Replace with actual token addresses
 	{
 		chain: morphHolesky,
