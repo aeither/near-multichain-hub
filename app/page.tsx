@@ -1,6 +1,6 @@
 "use client";
 
-import BalanceDisplay from "@/components/BalanceDisplay";
+import BalanceDisplay, { openCampusCodex } from "@/components/BalanceDisplay";
 import TokenBalanceDisplay from "@/components/TokenBalanceDisplay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +14,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { PlusIcon, SendIcon } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
+import { morphHolesky, sepolia } from "viem/chains";
+
+const chainOptions = {
+	Sepolia: sepolia,
+	Morph: morphHolesky,
+	"Open Campus": openCampusCodex,
+};
 
 export default function Dashboard() {
 	const { nearAccountId, nearPrivateKey, setNearAccountId, setNearPrivateKey } =
@@ -26,6 +33,7 @@ export default function Dashboard() {
 	const [transferAmount, setTransferAmount] = useState("");
 	const [transferTo, setTransferTo] = useState("");
 	const [transferNetwork, setTransferNetwork] = useState("Sepolia");
+	const [mintAmount, setMintAmount] = useState("");
 
 	const handleAccountIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setNearAccountId(e.target.value);
@@ -35,7 +43,7 @@ export default function Dashboard() {
 		setNearPrivateKey(e.target.value);
 	};
 
-	const handleTransfer = () => {
+	const handleTransfer = async () => {
 		if (!isCaEnabled) {
 			toast({
 				title: "Error",
@@ -44,12 +52,22 @@ export default function Dashboard() {
 			});
 			return;
 		}
-		caSendEth();
+		const selectedChain =
+			chainOptions[transferNetwork as keyof typeof chainOptions];
+		const hash = await caSendEth(
+			BigInt(transferAmount),
+			transferTo,
+			selectedChain,
+		);
+		toast({
+			title: "Sending...",
+			description: hash,
+		});
 		setTransferAmount("");
 		setTransferTo("");
 	};
 
-	const handleMintERC20 = () => {
+	const handleMintERC20 = async () => {
 		if (!isCaEnabled) {
 			toast({
 				title: "Error",
@@ -58,7 +76,14 @@ export default function Dashboard() {
 			});
 			return;
 		}
-		caMintERC20();
+		const selectedChain =
+			chainOptions[transferNetwork as keyof typeof chainOptions];
+		const hash = await caMintERC20(BigInt(mintAmount), selectedChain);
+		toast({
+			title: "Minting...",
+			description: hash,
+		});
+		setMintAmount("");
 	};
 
 	return (
@@ -193,13 +218,22 @@ export default function Dashboard() {
 					<CardTitle>ERC20 Minting</CardTitle>
 				</CardHeader>
 				<CardContent>
-					<Button
-						onClick={handleMintERC20}
-						className="w-full"
-						disabled={!isCaEnabled}
-					>
-						<PlusIcon className="mr-2 h-4 w-4" /> Mint ERC20
-					</Button>
+					<div className="space-y-4">
+						<Input
+							type="number"
+							placeholder="Amount to Mint"
+							value={mintAmount}
+							onChange={(e) => setMintAmount(e.target.value)}
+							aria-label="Mint Amount"
+						/>
+						<Button
+							onClick={handleMintERC20}
+							className="w-full"
+							disabled={!isCaEnabled}
+						>
+							<PlusIcon className="mr-2 h-4 w-4" /> Mint ERC20
+						</Button>
+					</div>
 				</CardContent>
 			</Card>
 
